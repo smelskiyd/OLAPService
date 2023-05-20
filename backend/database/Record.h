@@ -13,6 +13,9 @@ class Record {
     friend std::istream& operator>>(std::istream& in, Record& record);
     friend std::ostream& operator<<(std::ostream& out, const Record& record);
 
+    bool operator==(const Record& rhs);
+    bool operator!=(const Record& rhs);
+
     const std::string& getDimensionValue(const std::string& dimension) const;
 
   private:

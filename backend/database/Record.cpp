@@ -30,6 +30,21 @@ std::ostream& operator<<(std::ostream& out, const Record& record) {
     return out;
 }
 
+bool Record::operator==(const Record& rhs) {
+    return data == rhs.data &&
+           time == rhs.time &&
+           from == rhs.from &&
+           to == rhs.to &&
+           product_name == rhs.product_name &&
+           courier_id == rhs.courier_id &&
+           distance == rhs.distance &&
+           price == rhs.price;
+}
+
+bool Record::operator!=(const Record& rhs) {
+    return !(*this == rhs);
+}
+
 const std::string& Record::getDimensionValue(const std::string& dimension) const {
     if (dimension == "data") {
         return data;
