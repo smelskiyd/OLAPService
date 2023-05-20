@@ -17,35 +17,25 @@ class Server {
   private:
     static constexpr int kDefaultBufferSize{1025};
 
-    struct ClientData {
-        bool operator == (const ClientData& rhs) const {
-            return name == rhs.name && socket_fd == rhs.socket_fd;
-        }
-
-        std::string name;
-        int socket_fd;
-    };
-
     void init(int port);
-    void start_listen(int limit_of_connections) const;
-    int  initialize_fd_set(fd_set* read_fds);
+    void startListen(int limit_of_connections) const;
+    int  initializeFDSet(fd_set* read_fds);
 
-    void add_new_connection();
-    bool check_connection(ClientData client, fd_set* read_fds);
+    void addNewConnection();
+    bool checkConnection(int client, fd_set* read_fds);
 
-    void send_message_to(int socket_fd, const ChatMessage& message) const;
-    std::optional<ChatMessage> receive_message_from(int socket_fd);
-    void process_message_from(const ClientData& client, ChatMessage message);
+    void sendMessageTo(int socket_fd, const ChatMessage& message) const;
+    std::optional<ChatMessage> receiveMessageFrom(int socket_fd);
+    void processMessageFrom(int client, const ChatMessage& message);
 
-    void add_new_client(const ClientData& client_data);
-    void remove_client(const ClientData& client_name);
+    void addNewClient(int client_data);
+    void removeClient(int client_name);
 
-    int master_socket;
-    sockaddr_in address;
-    int address_len{sizeof(address)};
+    int master_socket_;
+    sockaddr_in address_;
+    int address_len_{sizeof(address_)};
 
-    std::vector<ClientData> clients;
-    std::map<std::string, int> sd_by_name;
+    std::vector<int> clients_;
 
-    char buffer[kDefaultBufferSize];
+    char buffer_[kDefaultBufferSize];
 };

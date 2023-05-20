@@ -14,12 +14,11 @@ class Client {
   public:
     Client() = default;
     ~Client() {
-        close(socket_fd);
+        close(socket_fd_);
     }
 
     void run(int port);
-    ChatMessage wait_for_all_connections();
-    bool has_any_messages();
+    bool hasAnyMessages();
 
     void send(const char* const message, int length) const;
     void send(const std::string& message) const;
@@ -27,21 +26,17 @@ class Client {
     std::string receive();
     std::string receive(int length);
 
-    ChatMessage receive_message();
-    void        send_message(const ChatMessage& message) const;
-
-    const std::string& get_name() const;
+    ChatMessage receiveMessage();
+    void        sendMessage(const ChatMessage& message) const;
 
   private:
     static constexpr int kDefaultBufferSize{1025};
 
     void init(int port);
-    void connect_to_server();
+    void connectToServer();
 
-    int socket_fd;
-    sockaddr_in server_addr;
+    int socket_fd_;
+    sockaddr_in server_addr_;
 
-    char buffer[kDefaultBufferSize];
-
-    std::string name;
+    char buffer_[kDefaultBufferSize];
 };

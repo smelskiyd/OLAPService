@@ -13,22 +13,19 @@ using namespace std::chrono_literals;
 static std::chrono::steady_clock::duration kWaitDuration{5s};
 
 void ReceiveMessage(Client& client) {
-    ChatMessage message = client.receive_message();
-    std::string from = message.get_field("from")->AsString();
-    std::string text = message.get_field("message")->AsString();
+    ChatMessage message = client.receiveMessage();
+    std::string text = message.get_field("response")->AsString();
 
-    printf("New message from user %s: %s\n", from.c_str(), text.c_str());
+    printf("New response: %s\n", text.c_str());
     fflush(stdout);
 }
 
 void SendMessage(Client& client, const std::string& receiver, const std::string& text) {
     ChatMessage message;
-    message.add_field("to", receiver);
-
-    message.add_field("message", text);
+    message.add_field("request", text);
     message.add_field("length", Json::Node(static_cast<int>(text.size())));
 
-    client.send_message(message);
+    client.sendMessage(message);
 
     printf("Message is successfully sent\n");
 }
@@ -37,7 +34,7 @@ void StartChatting(Client& client) {
     std::chrono::steady_clock::time_point last_tp = std::chrono::steady_clock::now() - kWaitDuration;
 
     while (true) {
-        while (client.has_any_messages()) {
+        while (client.hasAnyMessages()) {
             printf("Server has some messages\n");
             fflush(stdout);
 

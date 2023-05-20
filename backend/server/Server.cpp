@@ -91,90 +91,80 @@ namespace {
 
 
 void Server::init(int port) {
-    if ((master_socket = CreateMasterSocket()) == 0) {
+    if ((master_socket_ = CreateMasterSocket()) == 0) {
         ExitWithError("Failed to create Master socket");
     }
 
-    if (EnableMultipleConnections(master_socket) < 0) {
+    if (EnableMultipleConnections(master_socket_) < 0) {
         ExitWithError("Failed to enable multiple connections");
     }
 
-    CreateSocketAddress(&address, port);
+    CreateSocketAddress(&address_, port);
 
-    if (BindMasterSocket(master_socket, &address) < 0) {
+    if (BindMasterSocket(master_socket_, &address_) < 0) {
         ExitWithError("Bind Master socket failed");
     }
 
     printf("Listening port %d\n", port);
 }
 
-void Server::start_listen(int limit_of_connections) const {
-    if (ListenMasterSocket(master_socket, limit_of_connections) < 0) {
+void Server::startListen(int limit_of_connections) const {
+    if (ListenMasterSocket(master_socket_, limit_of_connections) < 0) {
         ExitWithError("Failed to start listen connections");
     }
 }
 
-int Server::initialize_fd_set(fd_set* read_fds) {
+int Server::initializeFDSet(fd_set* read_fds) {
     FD_ZERO(read_fds);
 
-    FD_SET(master_socket, read_fds);
-    int max_sd = master_socket;
+    FD_SET(master_socket_, read_fds);
+    int max_sd = master_socket_;
 
-    for (const auto& client : clients) {
-        FD_SET(client.socket_fd, read_fds);
-        max_sd = std::max(max_sd, client.socket_fd);
+    for (const auto& client_fd : clients_) {
+        FD_SET(client_fd, read_fds);
+        max_sd = std::max(max_sd, client_fd);
     }
 
     return max_sd;
 }
 
-void Server::add_new_connection() {
+void Server::addNewConnection() {
     int new_socket;
-    if ((new_socket = AcceptNewConnection(master_socket, &address, &address_len)) < 0) {
+    if ((new_socket = AcceptNewConnection(master_socket_, &address_, &address_len_)) < 0) {
         ExitWithError("Accepting error");
         return;
     }
 
     printf("New connection accepted, socket fd is %d, ip is: %s, port: %d\n",
-           new_socket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+           new_socket, inet_ntoa(address_.sin_addr), ntohs(address_.sin_port));
 
     {   /// Welcome message
         ChatMessage message;
-        message.add_field("from", Json::Node(std::string("server")));
-        const std::string hello_message{"Hello from server! You are successfully connected!\n"
-                                        "Please send a message with your name."};
-        message.add_field("message", Json::Node(hello_message));
 
-        send_message_to(new_socket, message);
+        const std::string hello_message{"Hello from server! You are successfully connected!"};
+        message.add_field("response", Json::Node(hello_message));
+
+        sendMessageTo(new_socket, message);
         puts("Welcome message sent successfully");
     }
 
-    {   /// Receive user name
-        auto message = receive_message_from(new_socket);
-        auto name_field = message->get_field("name");
-        if (!name_field) {
-            ExitWithError("Client-machine must send a message with name.");
-        }
-        std::string name = name_field->AsString();
-
-        add_new_client(ClientData{name, new_socket});
-    }
+    addNewClient(new_socket);
 }
 
-bool Server::check_connection(ClientData client, fd_set* read_fds) {
-    int socket_fd = client.socket_fd;
+bool Server::checkConnection(const int client_fd, fd_set* read_fds) {
+    int socket_fd = client_fd;
 
     if (FD_ISSET(socket_fd, read_fds)) {
-        auto message = receive_message_from(socket_fd);
+        auto message = receiveMessageFrom(socket_fd);
         if (!message) {
-            getpeername(socket_fd, reinterpret_cast<sockaddr*>(&address), reinterpret_cast<socklen_t*>(&address_len));
+            getpeername(socket_fd, reinterpret_cast<sockaddr*>(&address_), reinterpret_cast<socklen_t*>(&address_len_));
 
-            printf("Host disconnected, ip %s, port %d\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
-            remove_client(client);
+            printf("Host disconnected, ip %s, port %d\n", inet_ntoa(address_.sin_addr), ntohs(address_.sin_port));
+            removeClient(client_fd);
 
             return false;
         } else {
-            process_message_from(client, *message);
+            processMessageFrom(client_fd, *message);
         }
     }
 
@@ -184,15 +174,15 @@ bool Server::check_connection(ClientData client, fd_set* read_fds) {
 [[noreturn]]
 void Server::run(int port, int limit_of_connections) {
     init(port);
-    start_listen(limit_of_connections);
+    startListen(limit_of_connections);
 
-    address_len = sizeof(address);
+    address_len_ = sizeof(address_);
     puts("Waiting for connections ...");
 
     fd_set read_fds;
 
     while (true) {
-        int max_sd = initialize_fd_set(&read_fds);
+        int max_sd = initializeFDSet(&read_fds);
 
         int activity = select(max_sd + 1, &read_fds, nullptr, nullptr, nullptr);
 
@@ -200,72 +190,54 @@ void Server::run(int port, int limit_of_connections) {
             printf("Select error\n");
         }
 
-        if (FD_ISSET(master_socket, &read_fds)) {
-            add_new_connection();
+        if (FD_ISSET(master_socket_, &read_fds)) {
+            addNewConnection();
         }
 
-        for (int i = 0; i < clients.size(); ++i) {
-            if (!check_connection(clients[i], &read_fds)) {
+        for (int i = 0; i < clients_.size(); ++i) {
+            if (!checkConnection(clients_[i], &read_fds)) {
                 --i;
             }
         }
     }
 }
 
-void Server::add_new_client(const ClientData& client_data) {
-    clients.push_back(client_data);
-    sd_by_name.insert({client_data.name, client_data.socket_fd});
-    printf("New client with name \'%s\' was successfully added to the network with socked id = %d\n",
-           client_data.name.c_str(), client_data.socket_fd);
+void Server::addNewClient(const int client_fd) {
+    clients_.push_back(client_fd);
+    printf("New client was successfully added to the network with socked id = %d\n", client_fd);
 }
 
-void Server::remove_client(const ClientData& client_data) {
-    close(client_data.socket_fd);
-    clients.erase(std::find(clients.begin(), clients.end(), client_data));
-    sd_by_name.erase(sd_by_name.find(client_data.name));
+void Server::removeClient(const int client_fd) {
+    close(client_fd);
+    clients_.erase(std::find(clients_.begin(), clients_.end(), client_fd));
 
-    printf("Client with name \'%s\', at port %d, was successfully disconnected\n",
-           client_data.name.c_str(), client_data.socket_fd);
+    printf("Client at port %d, was successfully disconnected\n", client_fd);
 }
 
-void Server::send_message_to(int socket_descriptor, const ChatMessage& message) const {
+void Server::sendMessageTo(int socket_descriptor, const ChatMessage& message) const {
     SendTo(socket_descriptor, message.get_ready_message());
 }
 
-std::optional<ChatMessage> Server::receive_message_from(int socket_fd) {
-    int len = TryReceiveFrom(socket_fd, buffer, kDefaultMessageLength);
+std::optional<ChatMessage> Server::receiveMessageFrom(int socket_fd) {
+    int len = TryReceiveFrom(socket_fd, buffer_, kDefaultMessageLength);
     if (len == 0) {
         return std::nullopt;
     }
     if (len != kDefaultMessageLength) {
         ExitWithError("Failed to read message length");
     }
-    buffer[len] = '\0';
-    int message_length = std::atoi(buffer);
+    buffer_[len] = '\0';
+    int message_length = std::atoi(buffer_);
 
-    len = ReceiveFrom(socket_fd, buffer, message_length);
+    len = ReceiveFrom(socket_fd, buffer_, message_length);
     if (len != message_length) {
         ExitWithError("Failed to read message");
     }
 
-    return ChatMessage(std::string(buffer, buffer + len));
+    return ChatMessage(std::string(buffer_, buffer_ + len));
 }
 
-void Server::process_message_from(const ClientData& client, ChatMessage message) {
-    printf("Server received new message from user %s\n", client.name.c_str());
-    printf("Message = %s\n", message.get_json_message().c_str());
-    if (auto field_to = message.get_field("to"); field_to.has_value()) {
-        std::string to = field_to->AsString();
-        if (to == "server") {
-
-        } else {
-            message.remove_field("to");
-            message.add_field("from", client.name);
-
-            printf("Sending message to user %s\n", to.c_str());
-            send_message_to(sd_by_name[to], message);
-            printf("Message was successfully sent\n");
-            fflush(stdout);
-        }
-    }
+void Server::processMessageFrom(const int client_fd, const ChatMessage& message) {
+    printf("Server received new request from fd %d\n", client_fd);
+    printf("Request = %s\n", message.get_json_message().c_str());
 }
