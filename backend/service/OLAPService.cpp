@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "DiagramBuilder.h"
+#include "Requests.h"
 
 OLAPService::OLAPService(const std::string& db_storage_path) {
     initDatabase(db_storage_path);
@@ -40,9 +41,16 @@ std::string OLAPService::handleRequest(const Json::Node& request) {
         return "ERROR: No field `request-type`";
     }
 
-    const std::string request_type = request_object.at("request-type").AsString();
+    const RequestType request_type = ConvertStrToRequestType(request_object.at("request-type").AsString());
 
-    std::cout << "Request type: " << request_type << std::endl;
+    switch (request_type) {
+        case RequestType::GET_DIAGRAM: {
+            return getDiagramDump(DiagramType::RECORDS_PER_DATA);
+        }
+        case RequestType::UNDEFINED: {
+            return "ERROR: Undefined request type";
+        }
+    }
 
     return "OK";
 }
