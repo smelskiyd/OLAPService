@@ -246,7 +246,7 @@ void Server::processMessageFrom(const int client_fd, const ChatMessage& message)
 
     std::string response;
     if (const auto request = message.get_field("request"); request.has_value()) {
-        response = service_->handleRequest(request.value().AsString());
+        response = service_->handleRequest(request.value());
     } else {
         response = "ERROR: No request";
     }

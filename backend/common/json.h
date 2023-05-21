@@ -18,6 +18,25 @@ namespace Json {
     public:
         using variant::variant;
 
+        bool IsArray() const {
+            return std::holds_alternative<std::vector<Node>>(*this);
+        }
+        bool IsMap() const {
+            return std::holds_alternative<std::map<std::string, Node>>(*this);
+        }
+        bool IsBool() const {
+            return std::holds_alternative<bool>(*this);
+        }
+        bool IsInt() const {
+            return std::holds_alternative<int>(*this);
+        }
+        bool IsDouble() const {
+            return std::holds_alternative<double>(*this);
+        }
+        bool IsString() const {
+            return std::holds_alternative<std::string>(*this);
+        }
+
         const auto& AsArray() const {
             return std::get<std::vector<Node>>(*this);
         }

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "common/json.h"
+
 #include "database/Database.h"
 
 #include "Types.h"
@@ -15,7 +17,7 @@ class OLAPService {
 
     std::string getDiagramDump(DiagramType diagram_type) const;
 
-    std::string handleRequest(const std::string& request);
+    std::string handleRequest(const Json::Node& request);
 
   private:
     bool initDatabase(const std::string& db_storage_path);

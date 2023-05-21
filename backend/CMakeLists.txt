@@ -17,9 +17,7 @@ set(SRCS
 
 add_library(olap-lib STATIC ${SRCS})
 target_include_directories(olap-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-add_executable(OLAP main.cpp)
-target_link_libraries(OLAP PRIVATE olap-lib server-lib)
+target_link_libraries(olap-lib PUBLIC common-lib)
 
 # Server
 set(SERVER_LIB_SRCS
@@ -35,3 +33,7 @@ target_link_libraries(RunServer PRIVATE server-lib)
 
 add_executable(RunClient run_client.cpp)
 target_link_libraries(RunClient PRIVATE server-lib)
+
+# OLAP Server
+add_executable(OLAP-Server main.cpp)
+target_link_libraries(OLAP-Server PRIVATE olap-lib server-lib)

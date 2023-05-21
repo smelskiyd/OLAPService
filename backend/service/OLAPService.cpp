@@ -30,7 +30,19 @@ std::string OLAPService::getDiagramDump(DiagramType diagram_type) const {
     return diagrams_builder_->getDiagramDump(diagram_type).toJson();
 }
 
-std::string OLAPService::handleRequest(const std::string& request) {
-    return "ResponseXXX for " + request;
-}
+std::string OLAPService::handleRequest(const Json::Node& request) {
+    if (!request.IsMap()) {
+        return "ERROR: Bad request format";
+    }
 
+    const auto& request_object = request.AsMap();
+    if (request_object.find("request-type") == request_object.end()) {
+        return "ERROR: No field `request-type`";
+    }
+
+    const std::string request_type = request_object.at("request-type").AsString();
+
+    std::cout << "Request type: " << request_type << std::endl;
+
+    return "OK";
+}
