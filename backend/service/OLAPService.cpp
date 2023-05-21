@@ -39,6 +39,10 @@ std::string OLAPService::getDiagramDump(DiagramType diagram_type) const {
     return diagrams_builder_->getDiagramDump(diagram_type).toJson();
 }
 
+std::string OLAPService::getSlice(const std::vector<std::pair<std::string, std::string>>& slice) const {
+    return diagrams_builder_->getSlice(slice).toJson();
+}
+
 std::string OLAPService::handleRequest(const Json::Node& request) {
     if (!request.IsMap()) {
         return "ERROR: Bad request format";
@@ -110,6 +114,21 @@ std::string OLAPService::handleRequest(const Json::Node& request) {
             std::stringstream sstr;
             sstr << records_json;
             return sstr.str();
+        }
+        case RequestType::GET_SLICE: {
+            if (request_object.find("slice") == request_object.end()) {
+                return "ERROR: No field `slice`";
+            }
+
+            Json::Node slice_json = request_object.at("slice");
+
+            std::vector<std::pair<std::string, std::string>> slice;
+            for (const auto& arg : slice_json.AsArray()) {
+                slice.emplace_back(std::make_pair(arg.AsMap().at("dimension").AsString(),
+                                                  arg.AsMap().at("value").AsString()));
+            }
+
+            return getSlice(slice);
         }
         case RequestType::GET_DIAGRAM: {
             if (request_object.find("diagram-type") == request_object.end()) {

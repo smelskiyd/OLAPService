@@ -17,8 +17,11 @@ class DiagramBuilder {
     void buildDiagrams(const Database& database);
 
     CubeBase::Dump getDiagramDump(DiagramType diagram_type) const;
+    CubeBase::Dump getSlice(const std::vector<std::pair<std::string, std::string>>& slice) const;
 
   private:
+    Cube<Record, MeasureList<Record>> full_cube_{{"data", "time", "from", "to", "product_name",
+                                                  "courier_id", "distance", "price"}};
     Cube<Record, double> total_price_per_data_{{"data", "time"}};
     Cube<Record, MeasureList<Record>> records_per_data_{{"data"}};
 };

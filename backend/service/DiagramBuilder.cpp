@@ -11,6 +11,7 @@
 void DiagramBuilder::buildDiagrams(const Database& database) {
     total_price_per_data_.process(database.getRecords(), RecordTotalPriceAggregator());
     records_per_data_.process(database.getRecords(), RecordDefaultAggregator());
+    full_cube_.process(database.getRecords(), RecordDefaultAggregator());
 }
 
 CubeBase::Dump DiagramBuilder::getDiagramDump(DiagramType diagram_type) const {
@@ -27,4 +28,8 @@ CubeBase::Dump DiagramBuilder::getDiagramDump(DiagramType diagram_type) const {
             return {};
         }
     }
+}
+
+CubeBase::Dump DiagramBuilder::getSlice(const std::vector<std::pair<std::string, std::string>>& slice) const {
+    return full_cube_.getSlice(slice).dump();
 }

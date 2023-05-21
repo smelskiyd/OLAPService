@@ -12,6 +12,7 @@ enum class RequestType {
     ADD_RECORD,
     REMOVE_RECORD,
     GET_RECORDS,
+    GET_SLICE,
     GET_DIAGRAM,
     UNDEFINED
 };

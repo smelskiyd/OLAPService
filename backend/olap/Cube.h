@@ -6,6 +6,7 @@
 
 #include <map>
 #include <vector>
+#include <iostream>
 #include <sstream>
 
 class CubeBase {
@@ -38,11 +39,15 @@ class Cube : CubeBase {
     template<typename Aggregator>
     void process(const std::vector<SourceDataType>& source_data, Aggregator aggregator);
 
+    Cube getSlice(const std::vector<std::pair<std::string, std::string>>& slice_arguments) const;
+
     const Mapping& getMapping() const;
 
     virtual Dump dump() const override;
 
   private:
+    Cube(const Dimensions& dimensions, const Mapping& mapping);
+
     Keys getKeys(const SourceDataType& source_data);
 
     const Dimensions kDimensions_;
@@ -62,6 +67,11 @@ Cube<SourceDataType, MeasureType>::Cube(const Dimensions& dimensions) :
 }
 
 template<typename SourceDataType, typename MeasureType>
+Cube<SourceDataType, MeasureType>::Cube(const Dimensions& dimensions, const Mapping& mapping) :
+    kDimensions_(dimensions), cube_(mapping) {
+}
+
+template<typename SourceDataType, typename MeasureType>
 template<typename Aggregator>
 void Cube<SourceDataType, MeasureType>::process(const std::vector<SourceDataType>& source_data,
                                                 Aggregator aggregator) {
@@ -74,6 +84,37 @@ void Cube<SourceDataType, MeasureType>::process(const std::vector<SourceDataType
     for (const auto& [keys, value] : raw_mapping) {
         cube_[keys] = aggregator(value);
     }
+}
+
+template<typename SourceDataType, typename MeasureType>
+Cube<SourceDataType, MeasureType> Cube<SourceDataType, MeasureType>::getSlice(
+        const std::vector<std::pair<std::string, std::string>>& slice_arguments) const {
+    Mapping new_cube = cube_;
+
+    for (const auto& slice : slice_arguments) {
+        const auto dimension_name = slice.first;
+        const auto key_value = slice.second;
+
+        int pos = -1;
+        for (int i = 0; i < kDimensions_.size(); ++i) {
+            if (kDimensions_[i] == dimension_name) {
+                pos = i;
+                break;
+            }
+        }
+        assert(pos >= 0);
+
+        for (auto iter = new_cube.begin(); iter != new_cube.end();) {
+            if (iter->first[pos] != key_value) {
+                std::cout << iter->first[pos] << " " << key_value << std::endl;
+                iter = new_cube.erase(iter);
+            } else {
+                ++iter;
+            }
+        }
+    }
+
+    return Cube(kDimensions_, new_cube);
 }
 
 template<typename SourceDataType, typename MeasureType>

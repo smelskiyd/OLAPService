@@ -21,6 +21,7 @@ class OLAPService {
 
   private:
     std::string getDiagramDump(DiagramType diagram_type) const;
+    std::string getSlice(const std::vector<std::pair<std::string, std::string>>& slice) const;
 
     bool initDatabase(const std::string& db_storage_path);
 
