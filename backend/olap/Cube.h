@@ -5,6 +5,7 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -91,9 +92,14 @@ Cube<SourceDataType, MeasureType> Cube<SourceDataType, MeasureType>::getSlice(
         const std::vector<std::pair<std::string, std::string>>& slice_arguments) const {
     Mapping new_cube = cube_;
 
+    std::map<std::string, std::set<std::string>> filters;
     for (const auto& slice : slice_arguments) {
-        const auto dimension_name = slice.first;
-        const auto key_value = slice.second;
+        filters[slice.first].insert(slice.second);
+    }
+
+    for (const auto& slice : filters) {
+        const auto& dimension_name = slice.first;
+        const auto& keys = slice.second;
 
         int pos = -1;
         for (int i = 0; i < kDimensions_.size(); ++i) {
@@ -105,8 +111,7 @@ Cube<SourceDataType, MeasureType> Cube<SourceDataType, MeasureType>::getSlice(
         assert(pos >= 0);
 
         for (auto iter = new_cube.begin(); iter != new_cube.end();) {
-            if (iter->first[pos] != key_value) {
-                std::cout << iter->first[pos] << " " << key_value << std::endl;
+            if (keys.find(iter->first[pos]) == keys.end()) {
                 iter = new_cube.erase(iter);
             } else {
                 ++iter;
