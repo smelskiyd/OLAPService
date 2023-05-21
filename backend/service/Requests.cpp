@@ -5,7 +5,9 @@
 #include "Requests.h"
 
 RequestType ConvertStrToRequestType(const std::string& request_str) {
-    if (request_str == "SAVE") {
+    if (request_str == "RELOAD") {
+        return RequestType::RELOAD;
+    } else if (request_str == "SAVE") {
         return RequestType::SAVE;
     } else if (request_str == "ADD_RECORD") {
         return RequestType::ADD_RECORD;

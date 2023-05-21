@@ -15,12 +15,16 @@ class OLAPService {
   public:
     OLAPService(const std::string& db_storage_path);
 
-    std::string getDiagramDump(DiagramType diagram_type) const;
+    bool reload();
 
     std::string handleRequest(const Json::Node& request);
 
   private:
+    std::string getDiagramDump(DiagramType diagram_type) const;
+
     bool initDatabase(const std::string& db_storage_path);
+
+    const std::string kDBStoragePath;
 
     std::unique_ptr<Database> database_;
     std::unique_ptr<DiagramBuilder> diagrams_builder_;

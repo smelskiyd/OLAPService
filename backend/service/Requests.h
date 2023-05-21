@@ -7,6 +7,7 @@
 #include <string>
 
 enum class RequestType {
+    RELOAD,
     SAVE,
     ADD_RECORD,
     REMOVE_RECORD,

@@ -9,11 +9,19 @@
 #include "DiagramBuilder.h"
 #include "Requests.h"
 
-OLAPService::OLAPService(const std::string& db_storage_path) {
-    initDatabase(db_storage_path);
+OLAPService::OLAPService(const std::string& db_storage_path) : kDBStoragePath(db_storage_path) {
+    if (!reload()) {
+        std::cerr << "Failed to load database from file: " << kDBStoragePath << std::endl;
+        exit(1);
+    }
+}
+
+bool OLAPService::reload() {
+    bool result = initDatabase(kDBStoragePath);
 
     diagrams_builder_ = std::make_unique<DiagramBuilder>();
     diagrams_builder_->buildDiagrams(*database_);
+    return result;
 }
 
 bool OLAPService::initDatabase(const std::string& db_storage_path) {
@@ -44,6 +52,13 @@ std::string OLAPService::handleRequest(const Json::Node& request) {
     const RequestType request_type = ConvertStrToRequestType(request_object.at("request-type").AsString());
 
     switch (request_type) {
+        case RequestType::RELOAD: {
+            std::cout << "Reloading database" << '\n';
+            if (!reload()) {
+                return "ERROR: Failed to reload database";
+            }
+            return "OK";
+        }
         case RequestType::SAVE: {
             std::cout << "Saving database" << '\n';
             database_->save();
