@@ -151,6 +151,8 @@ std::ostream& operator << (std::ostream& out, const Json::Node& node) {
                 formatted_str += "\\";
             } else if (c == '"') {
                 formatted_str += "\\\"";
+            } else if (c == '\n') {
+                formatted_str += "\\\\n";
             } else {
                 formatted_str += c;
             }
@@ -161,23 +163,21 @@ std::ostream& operator << (std::ostream& out, const Json::Node& node) {
         out << "[";
         bool is_first = true;
         for (int i = 0; i < v.size(); ++i) {
-            if (!is_first) out << ",\n";
-            else out << "\n";
+            if (!is_first) out << ", ";
             is_first = false;
             out << v[i];
         }
-        out << "\n]";
+        out << "]";
     } else if (std::holds_alternative<std::map<std::string, Node>>(node)) {
         const std::map<std::string, Node>& m = node.AsMap();
         out << "{";
         bool is_first = true;
         for (const auto& item : m) {
-            if (!is_first) out << ",\n";
-            else out << "\n";
+            if (!is_first) out << ", ";
             is_first = false;
             out << "\"" << item.first << "\": " << item.second;
         }
-        out << "\n}";
+        out << "}";
     }
     return out;
 }

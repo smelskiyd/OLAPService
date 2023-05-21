@@ -6,6 +6,7 @@
 
 #include <arpa/inet.h>
 #include <sys/types.h>
+#include <set>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
@@ -18,6 +19,10 @@
 #include "ChatMessage.h"
 
 namespace {
+    void PrintError(const char* error_message) {
+        perror(error_message);
+    }
+
     void ExitWithError(const char* error_message, int exit_status = EXIT_FAILURE) {
         perror(error_message);
         exit(exit_status);
@@ -185,6 +190,7 @@ void Server::run(int port) {
 
         if (FD_ISSET(master_socket_, &read_fds)) {
             addNewConnection();
+            continue;
         }
 
         for (int i = 0; i < clients_.size(); ++i) {
@@ -217,7 +223,8 @@ std::optional<ChatMessage> Server::receiveMessageFrom(int socket_fd) {
         return std::nullopt;
     }
     if (len != kDefaultMessageLength) {
-        ExitWithError("Failed to read message length");
+        PrintError("Failed to read message length");
+        return std::nullopt;
     }
     buffer_[len] = '\0';
     int message_length = std::atoi(buffer_);
@@ -225,7 +232,8 @@ std::optional<ChatMessage> Server::receiveMessageFrom(int socket_fd) {
     if (message_length + 1 < kDefaultBufferSize) {
         len = ReceiveFrom(socket_fd, buffer_, message_length);
         if (len != message_length) {
-            ExitWithError("Failed to read message");
+            PrintError("Failed to read message");
+            return std::nullopt;
         }
         return ChatMessage(std::string(buffer_, buffer_ + len));
     }
@@ -234,7 +242,8 @@ std::optional<ChatMessage> Server::receiveMessageFrom(int socket_fd) {
     large_message.resize(message_length);
     len = ReceiveFrom(socket_fd, large_message.data(), message_length);
     if (len != message_length) {
-        ExitWithError("Failed to read message");
+        PrintError("Failed to read message");
+        return std::nullopt;
     }
 
     return ChatMessage(large_message);
@@ -253,5 +262,6 @@ void Server::processMessageFrom(const int client_fd, const ChatMessage& message)
     ChatMessage response_message;
     response_message.add_field("response", response);
 
+    printf("Responding to the client\n");
     sendMessageTo(client_fd, response_message);
 }
