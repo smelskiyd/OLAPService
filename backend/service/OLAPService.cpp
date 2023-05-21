@@ -82,6 +82,20 @@ std::string OLAPService::handleRequest(const Json::Node& request) {
                 return "ERROR: There is no such record";
             }
         }
+        case RequestType::GET_RECORDS: {
+            std::vector<Json::Node> records;
+
+            for (const auto& record : database_->getRecords()) {
+                std::stringstream sstr;
+                sstr << record;
+                records.emplace_back(sstr.str());
+            }
+
+            Json::Node records_json(records);
+            std::stringstream sstr;
+            sstr << records_json;
+            return sstr.str();
+        }
         case RequestType::GET_DIAGRAM: {
             if (request_object.find("diagram-type") == request_object.end()) {
                 return "ERROR: No field `diagram-type`";

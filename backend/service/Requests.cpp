@@ -11,6 +11,8 @@ RequestType ConvertStrToRequestType(const std::string& request_str) {
         return RequestType::ADD_RECORD;
     } else if (request_str == "REMOVE_RECORD") {
         return RequestType::REMOVE_RECORD;
+    } else if (request_str == "GET_RECORDS") {
+        return RequestType::GET_RECORDS;
     } else if (request_str == "GET_DIAGRAM") {
         return RequestType::GET_DIAGRAM;
     } else {
