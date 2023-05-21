@@ -45,7 +45,17 @@ std::string OLAPService::handleRequest(const Json::Node& request) {
 
     switch (request_type) {
         case RequestType::GET_DIAGRAM: {
-            return getDiagramDump(DiagramType::RECORDS_PER_DATA);
+            if (request_object.find("diagram-type") == request_object.end()) {
+                return "ERROR: No field `diagram-type`";
+            }
+
+            const DiagramType diagram_type = ConvertStrToDiagramType(request_object.at("diagram-type").AsString());
+
+            if (diagram_type == DiagramType::UNDEFINED) {
+                return "ERROR: Undefined diagram type";
+            }
+
+            return getDiagramDump(diagram_type);
         }
         case RequestType::UNDEFINED: {
             return "ERROR: Undefined request type";

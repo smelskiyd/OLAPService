@@ -17,6 +17,10 @@ void ChatMessage::reset() {
     data.clear();
 }
 
+bool ChatMessage::is_empty() const {
+    return data.empty();
+}
+
 void ChatMessage::add_field(const std::string &field_name, const char* const value) {
     data.insert({field_name, Json::Node(std::string(value))});
 }

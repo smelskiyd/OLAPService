@@ -14,6 +14,7 @@ set(SRCS
         service/OLAPService.cpp
         service/DiagramBuilder.cpp
         service/Requests.cpp
+        service/Types.cpp
         olap/Cube.cpp)
 
 add_library(olap-lib STATIC ${SRCS})

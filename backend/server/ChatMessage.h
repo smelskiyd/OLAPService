@@ -17,6 +17,8 @@ class ChatMessage {
 
     void reset();
 
+    bool is_empty() const;
+
     void add_field(const std::string& field_name, const char* const value);
     void add_field(const std::string& field_name, const Json::Node& node);
     void add_field(const std::string& field_name, Json::Node&& node);
