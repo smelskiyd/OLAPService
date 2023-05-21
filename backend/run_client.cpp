@@ -26,7 +26,6 @@ void SendMessage(Client& client, const std::string& receiver, const std::string&
 
     ChatMessage message;
     message.add_field("request", request_body);
-    message.add_field("length", Json::Node(static_cast<int>(text.size())));
 
     client.sendMessage(message);
 
