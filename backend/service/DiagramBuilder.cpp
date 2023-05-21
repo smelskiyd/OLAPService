@@ -15,7 +15,7 @@ void DiagramBuilder::buildDiagrams(const Database& database) {
 
 CubeBase::Dump DiagramBuilder::getDiagramDump(DiagramType diagram_type) const {
     switch (diagram_type) {
-        case DiagramType::PRICE_PER_DATA: {
+        case DiagramType::TOTAL_PRICE_PER_DATA: {
             return total_price_per_data_.dump();
         }
         case DiagramType::RECORDS_PER_DATA: {

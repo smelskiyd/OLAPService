@@ -7,7 +7,7 @@
 #include <string>
 
 enum class DiagramType {
-    PRICE_PER_DATA,
+    TOTAL_PRICE_PER_DATA,
     RECORDS_PER_DATA,
     COUNT,
     UNDEFINED
