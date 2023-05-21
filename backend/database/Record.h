@@ -7,9 +7,12 @@
 #include <string>
 #include <istream>
 #include <ostream>
+#include <optional>
 
 class Record {
   public:
+    static std::optional<Record> ParseFromString(const std::string& str);
+
     friend std::istream& operator>>(std::istream& in, Record& record);
     friend std::ostream& operator<<(std::ostream& out, const Record& record);
 
@@ -18,7 +21,7 @@ class Record {
 
     const std::string& getDimensionValue(const std::string& dimension) const;
 
-  private:
+  public:
     std::string data;
     std::string time;
     std::string from;

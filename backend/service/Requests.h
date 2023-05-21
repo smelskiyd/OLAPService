@@ -7,6 +7,7 @@
 #include <string>
 
 enum class RequestType {
+    ADD_RECORD,
     GET_DIAGRAM,
     UNDEFINED
 };

@@ -4,6 +4,49 @@
 
 #include "Record.h"
 
+#include <sstream>
+
+std::optional<Record> Record::ParseFromString(const std::string& str) {
+    std::stringstream sstr;
+    sstr << str;
+
+    Record record;
+    sstr >> record.data;
+    if (sstr.fail()) {
+        return std::nullopt;
+    }
+    sstr >> record.time;
+    if (sstr.fail()) {
+        return std::nullopt;
+    }
+    sstr >> record.from;
+    if (sstr.fail()) {
+        return std::nullopt;
+    }
+    sstr >> record.to;
+    if (sstr.fail()) {
+        return std::nullopt;
+    }
+    sstr >> record.product_name;
+    if (sstr.fail()) {
+        return std::nullopt;
+    }
+    sstr >> record.courier_id;
+    if (sstr.fail()) {
+        return std::nullopt;
+    }
+    sstr >> record.distance;
+    if (sstr.fail()) {
+        return std::nullopt;
+    }
+    sstr >> record.price;
+    if (sstr.fail()) {
+        return std::nullopt;
+    }
+
+    return record;
+}
+
 std::istream& operator>>(std::istream& in, Record& record) {
     in >> record.data
         >> record.time

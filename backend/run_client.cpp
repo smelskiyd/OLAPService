@@ -44,7 +44,13 @@ std::optional<ChatMessage> GetUserInput() {
     std::map<std::string, Json::Node> request_body;
     request_body["request-type"] = Json::Node(input_text);
 
-    if (input_text == "GET_DIAGRAM") {
+    if (input_text == "ADD_RECORD") {
+        printf("Print new record data: \n");
+
+        std::string record_data;
+        getline(std::cin, record_data);
+        request_body["data"] = Json::Node(record_data);
+    } else if (input_text == "GET_DIAGRAM") {
         printf("Print diagram type: \n");
 
         std::string diagram_type;

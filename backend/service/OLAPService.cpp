@@ -44,6 +44,21 @@ std::string OLAPService::handleRequest(const Json::Node& request) {
     const RequestType request_type = ConvertStrToRequestType(request_object.at("request-type").AsString());
 
     switch (request_type) {
+        case RequestType::ADD_RECORD: {
+            if (request_object.find("data") == request_object.end()) {
+                return "ERROR: No field `data`";
+            }
+
+            const std::string data_str = request_object.at("data").AsString();
+            const auto record = Record::ParseFromString(data_str);
+            if (!record.has_value()) {
+                return "ERROR: Failed to parse record";
+            }
+
+            std::cout << "Adding new record: {" << record.value() << "}\n";
+            database_->addRecord(record.value());
+            return "OK";
+        }
         case RequestType::GET_DIAGRAM: {
             if (request_object.find("diagram-type") == request_object.end()) {
                 return "ERROR: No field `diagram-type`";
