@@ -18,8 +18,6 @@
 #include "ChatMessage.h"
 
 namespace {
-    constexpr int kDefaultBufferSize{1025};
-
     void ExitWithError(const char* error_message, int exit_status = EXIT_FAILURE) {
         perror(error_message);
         exit(exit_status);
@@ -63,15 +61,6 @@ namespace {
         if (send(socket_descriptor, message.data(), message.size(), 0) != message.size()) {
             ExitWithError("Failed to send message");
         }
-    }
-
-    int ReceiveFrom(int socket_descriptor, char* message) {
-        int len = recv(socket_descriptor, message, kDefaultBufferSize - 1, 0);
-        if (len < 0) {
-            ExitWithError("Failed to receive data from user");
-        }
-
-        return len;
     }
 
     int ReceiveFrom(int socket_descriptor, char* message, int length, int flags = 0) {
@@ -233,12 +222,22 @@ std::optional<ChatMessage> Server::receiveMessageFrom(int socket_fd) {
     buffer_[len] = '\0';
     int message_length = std::atoi(buffer_);
 
-    len = ReceiveFrom(socket_fd, buffer_, message_length);
+    if (message_length + 1 < kDefaultBufferSize) {
+        len = ReceiveFrom(socket_fd, buffer_, message_length);
+        if (len != message_length) {
+            ExitWithError("Failed to read message");
+        }
+        return ChatMessage(std::string(buffer_, buffer_ + len));
+    }
+
+    std::string large_message;
+    large_message.resize(message_length);
+    len = ReceiveFrom(socket_fd, large_message.data(), message_length);
     if (len != message_length) {
         ExitWithError("Failed to read message");
     }
 
-    return ChatMessage(std::string(buffer_, buffer_ + len));
+    return ChatMessage(large_message);
 }
 
 void Server::processMessageFrom(const int client_fd, const ChatMessage& message) {

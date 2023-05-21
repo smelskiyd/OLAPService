@@ -20,11 +20,7 @@ class Client {
     void run(int port);
     bool hasAnyMessages();
 
-    void send(const char* const message, int length) const;
     void send(const std::string& message) const;
-
-    std::string receive();
-    std::string receive(int length);
 
     ChatMessage receiveMessage();
     void        sendMessage(const ChatMessage& message) const;

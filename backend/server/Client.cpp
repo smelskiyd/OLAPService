@@ -78,29 +78,8 @@ bool Client::hasAnyMessages() {
     return activity > 0;
 }
 
-void Client::send(const char *const message, int length) const {
-    SendToServer(socket_fd_, message, length);
-}
-
 void Client::send(const std::string& message) const {
     SendToServer(socket_fd_, message.data(), message.size());
-}
-
-std::string Client::receive() {
-    int len = ReadFromServer(socket_fd_, buffer_, kDefaultBufferSize - 1);
-
-    std::string result(buffer_, buffer_ + len);
-    return result;
-}
-
-std::string Client::receive(int length) {
-    int len = ReadFromServer(socket_fd_, buffer_, length);
-    if (len != length) {
-        ExitWithError("Failed to receive enough data from server");
-    }
-
-    std::string result(buffer_, buffer_ + len);
-    return result;
 }
 
 ChatMessage Client::receiveMessage() {
@@ -111,12 +90,22 @@ ChatMessage Client::receiveMessage() {
     buffer_[len] = '\0';
     int message_length = std::atoi(buffer_);
 
-    len = ReadFromServer(socket_fd_, buffer_, message_length);
+    if (message_length + 1 < kDefaultBufferSize) {
+        len = ReadFromServer(socket_fd_, buffer_, message_length);
+        if (len != message_length) {
+            ExitWithError("Failed to read message");
+        }
+        return ChatMessage(std::string(buffer_, buffer_ + len));
+    }
+
+    std::string large_message;
+    large_message.resize(message_length);
+    len = ReadFromServer(socket_fd_, large_message.data(), message_length);
     if (len != message_length) {
         ExitWithError("Failed to read message");
     }
 
-    return ChatMessage(std::string(buffer_, buffer_ + len));
+    return ChatMessage(large_message);
 }
 
 void Client::sendMessage(const ChatMessage& message) const {
