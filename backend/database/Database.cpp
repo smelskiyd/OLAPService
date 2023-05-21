@@ -28,9 +28,14 @@ void Database::addRecord(const Record& new_record) {
     records_.push_back(new_record);
 }
 
-void Database::removeRecord(const Record& record) {
+bool Database::removeRecord(const Record& record) {
     const auto it = std::find(records_.begin(), records_.end(), record);
-    records_.erase(it);
+    if (it == records_.end()) {
+        return false;
+    } else {
+        records_.erase(it);
+        return true;
+    }
 }
 
 bool Database::save() const {

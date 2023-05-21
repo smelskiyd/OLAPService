@@ -20,7 +20,7 @@ class Database {
     size_t getRecordsCount() const;
 
     void addRecord(const Record& new_record);
-    void removeRecord(const Record& record);
+    bool removeRecord(const Record& record);
 
     bool save() const;
 

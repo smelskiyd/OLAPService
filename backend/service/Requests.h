@@ -9,6 +9,7 @@
 enum class RequestType {
     SAVE,
     ADD_RECORD,
+    REMOVE_RECORD,
     GET_DIAGRAM,
     UNDEFINED
 };

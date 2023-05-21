@@ -64,6 +64,24 @@ std::string OLAPService::handleRequest(const Json::Node& request) {
             database_->addRecord(record.value());
             return "OK";
         }
+        case RequestType::REMOVE_RECORD: {
+            if (request_object.find("data") == request_object.end()) {
+                return "ERROR: No field `data`";
+            }
+
+            const std::string data_str = request_object.at("data").AsString();
+            const auto record = Record::ParseFromString(data_str);
+            if (!record.has_value()) {
+                return "ERROR: Failed to parse record";
+            }
+
+            std::cout << "Removing record: {" << record.value() << "}\n";
+            if (database_->removeRecord(record.value())) {
+                return "OK";
+            } else {
+                return "ERROR: There is no such record";
+            }
+        }
         case RequestType::GET_DIAGRAM: {
             if (request_object.find("diagram-type") == request_object.end()) {
                 return "ERROR: No field `diagram-type`";
