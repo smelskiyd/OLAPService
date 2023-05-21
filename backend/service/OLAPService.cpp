@@ -29,3 +29,8 @@ bool OLAPService::initDatabase(const std::string& db_storage_path) {
 std::string OLAPService::getDiagramDump(DiagramType diagram_type) const {
     return diagrams_builder_->getDiagramDump(diagram_type).toJson();
 }
+
+std::string OLAPService::handleRequest(const std::string& request) {
+    return "ResponseXXX for " + request;
+}
+

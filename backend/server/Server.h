@@ -5,16 +5,22 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <arpa/inet.h>
 
 #include "ChatMessage.h"
 
+#include "service/OLAPService.h"
+
 class Server {
   public:
+    void init(std::unique_ptr<OLAPService>&& service);
+
     [[noreturn]]
-    void run(int port, int limit_of_connections = 1);
+    void run(int port);
 
   private:
+    static constexpr int kLimitOfConnection{1};
     static constexpr int kDefaultBufferSize{1025};
 
     void init(int port);
@@ -38,4 +44,6 @@ class Server {
     std::vector<int> clients_;
 
     char buffer_[kDefaultBufferSize];
+
+    std::unique_ptr<OLAPService> service_;
 };

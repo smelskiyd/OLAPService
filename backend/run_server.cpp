@@ -8,5 +8,5 @@
 
 int main(int argc , char* argv[]) {
     Server server;
-    server.run(DEFAULT_PORT, 3);
+    server.run(DEFAULT_PORT);
 }

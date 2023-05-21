@@ -15,6 +15,8 @@ class OLAPService {
 
     std::string getDiagramDump(DiagramType diagram_type) const;
 
+    std::string handleRequest(const std::string& request);
+
   private:
     bool initDatabase(const std::string& db_storage_path);
 

@@ -171,10 +171,14 @@ bool Server::checkConnection(const int client_fd, fd_set* read_fds) {
     return true;
 }
 
+void Server::init(std::unique_ptr<OLAPService>&& service) {
+    service_ = std::move(service);
+}
+
 [[noreturn]]
-void Server::run(int port, int limit_of_connections) {
+void Server::run(int port) {
     init(port);
-    startListen(limit_of_connections);
+    startListen(kLimitOfConnection);
 
     address_len_ = sizeof(address_);
     puts("Waiting for connections ...");
@@ -239,5 +243,16 @@ std::optional<ChatMessage> Server::receiveMessageFrom(int socket_fd) {
 
 void Server::processMessageFrom(const int client_fd, const ChatMessage& message) {
     printf("Server received new request from fd %d\n", client_fd);
-    printf("Request = %s\n", message.get_json_message().c_str());
+
+    std::string response;
+    if (const auto request = message.get_field("request"); request.has_value()) {
+        response = service_->handleRequest(request.value().AsString());
+    } else {
+        response = "ERROR: No request";
+    }
+
+    ChatMessage response_message;
+    response_message.add_field("response", response);
+
+    sendMessageTo(client_fd, response_message);
 }

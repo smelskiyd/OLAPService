@@ -5,12 +5,10 @@
 #include <iostream>
 #include <string>
 
-#include "database/Database.h"
 #include "service/OLAPService.h"
-#include "olap/Cube.h"
-#include "olap/Measure.h"
+#include "server/Server.h"
 
-#include "service/Aggregators.h"
+#define DEFAULT_PORT 8888
 
 // [Data, Time] -> Total Price
 //void Graph1(const Database& database) {
@@ -27,10 +25,16 @@
 //}
 
 int main() {
-    OLAPService service("/Users/smelskiyd/CLionProjects/OLAP/storage/records");
+    std::unique_ptr<OLAPService> service =
+        std::make_unique<OLAPService>("/Users/smelskiyd/CLionProjects/OLAP/backend/storage/records");
 
-    std::cout << service.getDiagramDump(DiagramType::PRICE_PER_DATA) << std::endl;
-    std::cout << service.getDiagramDump(DiagramType::RECORDS_PER_DATA) << std::endl;
+    Server server;
+    server.init(std::move(service));
+
+    server.run(DEFAULT_PORT);
+
+//    std::cout << service.getDiagramDump(DiagramType::PRICE_PER_DATA) << std::endl;
+//    std::cout << service.getDiagramDump(DiagramType::RECORDS_PER_DATA) << std::endl;
 
     return 0;
 }
