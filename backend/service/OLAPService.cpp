@@ -44,6 +44,11 @@ std::string OLAPService::handleRequest(const Json::Node& request) {
     const RequestType request_type = ConvertStrToRequestType(request_object.at("request-type").AsString());
 
     switch (request_type) {
+        case RequestType::SAVE: {
+            std::cout << "Saving database" << '\n';
+            database_->save();
+            return "OK";
+        }
         case RequestType::ADD_RECORD: {
             if (request_object.find("data") == request_object.end()) {
                 return "ERROR: No field `data`";
