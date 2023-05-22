@@ -22,7 +22,7 @@ class DiagramBuilder {
   private:
     Cube<Record, MeasureList<Record>> full_cube_{{"data", "time", "from", "to", "product_name",
                                                   "courier_id", "distance", "price"}};
-    Cube<Record, double> total_price_per_data_{{"data", "time"}};
+    Cube<Record, double> total_price_per_data_{{"data"}};
     Cube<Record, uint64_t> deliveries_per_data_and_time_{{"data", "time"}};
     Cube<Record, uint64_t> deliveries_per_distance_and_time_{{"distance", "time"}};
     Cube<Record, uint64_t> products_count_{{"product_name"}};
