@@ -35,8 +35,8 @@ bool OLAPService::initDatabase(const std::string& db_storage_path) {
     return true;
 }
 
-std::string OLAPService::getDiagramDump(DiagramType diagram_type) const {
-    return diagrams_builder_->getDiagramDump(diagram_type).toJson();
+std::string OLAPService::getDiagramDump(DiagramType diagram_type, bool need_sort) const {
+    return diagrams_builder_->getDiagramDump(diagram_type, need_sort).toJson();
 }
 
 std::string OLAPService::getSlice(const std::vector<std::pair<std::string, std::string>>& slice) const {
@@ -137,11 +137,19 @@ std::string OLAPService::handleRequest(const Json::Node& request) {
 
             const DiagramType diagram_type = ConvertStrToDiagramType(request_object.at("diagram-type").AsString());
 
+            bool need_sort = false;
+            if (request_object.find("sort") != request_object.end()) {
+                const std::string& should_sort_str = request_object.at("sort").AsString();
+                if (should_sort_str == "yes") {
+                    need_sort = true;
+                }
+            }
+
             if (diagram_type == DiagramType::UNDEFINED) {
                 return "ERROR: Undefined diagram type";
             }
 
-            return getDiagramDump(diagram_type);
+            return getDiagramDump(diagram_type, need_sort);
         }
         case RequestType::UNDEFINED: {
             return "ERROR: Undefined request type";

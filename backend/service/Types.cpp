@@ -28,3 +28,11 @@ std::ostream& operator<<(std::ostream& out, const PriceRange& price_range) {
     out << "[" << price_range.min_price << ", " << price_range.max_price << "]";
     return out;
 }
+
+bool PriceRange::operator<(const PriceRange& rhs) const {
+    return min_price < rhs.min_price || (min_price == rhs.min_price && max_price < rhs.max_price);
+}
+
+bool PriceRange::operator>(const PriceRange& rhs) const {
+    return !(*this < rhs);
+}

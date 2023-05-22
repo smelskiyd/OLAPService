@@ -13,8 +13,8 @@ enum class DiagramType {
     DELIVERIES_PER_DATA_AND_TIME,
     DELIVERIES_PER_DISTANCE_AND_TIME,
     PRICE_RANGE_PER_DATA,
-    RECORDS_PER_DATA,
     COURIERS_REVENUE,
+    RECORDS_PER_DATA,
     COUNT,
     UNDEFINED
 };
@@ -26,4 +26,7 @@ struct PriceRange {
     double max_price;
 
     friend std::ostream& operator<<(std::ostream& out, const PriceRange& price_range);
+
+    bool operator<(const PriceRange& rhs) const;
+    bool operator>(const PriceRange& rhs) const;
 };

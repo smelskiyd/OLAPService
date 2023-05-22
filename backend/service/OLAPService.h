@@ -20,7 +20,7 @@ class OLAPService {
     std::string handleRequest(const Json::Node& request);
 
   private:
-    std::string getDiagramDump(DiagramType diagram_type) const;
+    std::string getDiagramDump(DiagramType diagram_type, bool need_sort) const;
     std::string getSlice(const std::vector<std::pair<std::string, std::string>>& slice) const;
 
     bool initDatabase(const std::string& db_storage_path);

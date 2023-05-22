@@ -12,6 +12,9 @@ struct MeasureList {
     explicit MeasureList(const std::vector<Measure>& source_data) : data(source_data) {}
     explicit MeasureList(std::vector<Measure>&& source_data) : data(std::move(source_data)) {}
 
+    bool operator<(const MeasureList& rhs) const { return false; }
+    bool operator>(const MeasureList& rhs) const { return false; }
+
     std::vector<Measure> data;
 };
 

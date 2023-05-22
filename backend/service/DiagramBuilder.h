@@ -16,7 +16,7 @@ class DiagramBuilder {
 
     void buildDiagrams(const Database& database);
 
-    CubeBase::Dump getDiagramDump(DiagramType diagram_type) const;
+    CubeBase::Dump getDiagramDump(DiagramType diagram_type, bool need_sort) const;
     CubeBase::Dump getSlice(const std::vector<std::pair<std::string, std::string>>& slice) const;
 
   private:

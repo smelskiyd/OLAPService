@@ -26,6 +26,7 @@ class CubeBase {
     virtual ~CubeBase() = default;
 
     virtual Dump dump() const = 0;
+    virtual Dump dump(bool need_sort) const = 0;
 };
 
 template<typename SourceDataType, typename MeasureType>
@@ -45,6 +46,7 @@ class Cube : CubeBase {
     const Mapping& getMapping() const;
 
     virtual Dump dump() const override;
+    virtual Dump dump(bool need_sort) const override;
 
   private:
     Cube(const Dimensions& dimensions, const Mapping& mapping);
@@ -133,6 +135,34 @@ CubeBase::Dump Cube<SourceDataType, MeasureType>::dump() const {
     dump.dimensions_name = kDimensions_;
 
     for (const auto& [keys, value] : cube_) {
+        std::stringstream sstr;
+        sstr << value;
+
+        dump.values.push_back({keys, sstr.str()});
+    }
+
+    return dump;
+}
+
+template<typename SourceDataType, typename MeasureType>
+CubeBase::Dump Cube<SourceDataType, MeasureType>::dump(bool need_sort) const {
+    if (!need_sort) {
+        return dump();
+    }
+
+    Dump dump;
+    dump.dimensions_name = kDimensions_;
+
+    std::vector<std::pair<Keys, MeasureType>> sorted_results;
+    for (const auto& [keys, value] : cube_) {
+        sorted_results.push_back({keys, value});
+    }
+    std::sort(sorted_results.begin(), sorted_results.end(),
+              [](const std::pair<Keys, MeasureType>& lhs, const std::pair<Keys, MeasureType>& rhs) {
+        return lhs.second > rhs.second;
+    });
+
+    for (const auto& [keys, value] : sorted_results) {
         std::stringstream sstr;
         sstr << value;
 

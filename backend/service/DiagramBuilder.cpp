@@ -19,28 +19,28 @@ void DiagramBuilder::buildDiagrams(const Database& database) {
     full_cube_.process(database.getRecords(), RecordDefaultAggregator());
 }
 
-CubeBase::Dump DiagramBuilder::getDiagramDump(DiagramType diagram_type) const {
+CubeBase::Dump DiagramBuilder::getDiagramDump(DiagramType diagram_type, bool need_sort) const {
     switch (diagram_type) {
         case DiagramType::TOTAL_PRICE_PER_DATA: {
-            return total_price_per_data_.dump();
+            return total_price_per_data_.dump(need_sort);
         }
         case DiagramType::PRODUCTS_COUNT: {
-            return products_count_.dump();
+            return products_count_.dump(need_sort);
         }
         case DiagramType::DELIVERIES_PER_DATA_AND_TIME: {
-            return deliveries_per_data_and_time_.dump();
+            return deliveries_per_data_and_time_.dump(need_sort);
         }
         case DiagramType::DELIVERIES_PER_DISTANCE_AND_TIME: {
-            return deliveries_per_distance_and_time_.dump();
+            return deliveries_per_distance_and_time_.dump(need_sort);
         }
         case DiagramType::PRICE_RANGE_PER_DATA: {
-            return price_range_per_data_.dump();
+            return price_range_per_data_.dump(need_sort);
         }
         case DiagramType::COURIERS_REVENUE: {
-            return couriers_revenue_.dump();
+            return couriers_revenue_.dump(need_sort);
         }
         case DiagramType::RECORDS_PER_DATA: {
-            return records_per_data_.dump();
+            return records_per_data_.dump(need_sort);
         }
         case DiagramType::COUNT:
         case DiagramType::UNDEFINED: {
