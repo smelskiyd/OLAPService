@@ -8,7 +8,7 @@
 
 #include "json.h"
 
-static constexpr int kDefaultMessageLength{4};
+static constexpr int kDefaultMessageLength{6};
 
 class ChatMessage {
   public:
