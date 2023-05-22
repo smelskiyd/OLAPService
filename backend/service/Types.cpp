@@ -15,6 +15,8 @@ DiagramType ConvertStrToDiagramType(const std::string& diagram_type_str) {
         return DiagramType::DELIVERIES_PER_DISTANCE_AND_TIME;
     } else if (diagram_type_str == "PRICE_RANGE_PER_DATA") {
         return DiagramType::PRICE_RANGE_PER_DATA;
+    } else if (diagram_type_str == "COURIERS_REVENUE") {
+        return DiagramType::COURIERS_REVENUE;
     } else if (diagram_type_str == "RECORDS_PER_DATA") {
         return DiagramType::RECORDS_PER_DATA;
     } else {

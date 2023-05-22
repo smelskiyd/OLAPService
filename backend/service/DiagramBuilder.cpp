@@ -14,6 +14,7 @@ void DiagramBuilder::buildDiagrams(const Database& database) {
     deliveries_per_data_and_time_.process(database.getRecords(), RecordCountAggregator());
     deliveries_per_distance_and_time_.process(database.getRecords(), RecordCountAggregator());
     price_range_per_data_.process(database.getRecords(), RecordPriceRangeAggregator());
+    couriers_revenue_.process(database.getRecords(), RecordTotalPriceAggregator());
     records_per_data_.process(database.getRecords(), RecordDefaultAggregator());
     full_cube_.process(database.getRecords(), RecordDefaultAggregator());
 }
@@ -34,6 +35,9 @@ CubeBase::Dump DiagramBuilder::getDiagramDump(DiagramType diagram_type) const {
         }
         case DiagramType::PRICE_RANGE_PER_DATA: {
             return price_range_per_data_.dump();
+        }
+        case DiagramType::COURIERS_REVENUE: {
+            return couriers_revenue_.dump();
         }
         case DiagramType::RECORDS_PER_DATA: {
             return records_per_data_.dump();
