@@ -10,6 +10,7 @@
 
 void DiagramBuilder::buildDiagrams(const Database& database) {
     total_price_per_data_.process(database.getRecords(), RecordTotalPriceAggregator());
+    products_count_.process(database.getRecords(), RecordCountAggregator());
     records_per_data_.process(database.getRecords(), RecordDefaultAggregator());
     full_cube_.process(database.getRecords(), RecordDefaultAggregator());
 }
@@ -18,6 +19,9 @@ CubeBase::Dump DiagramBuilder::getDiagramDump(DiagramType diagram_type) const {
     switch (diagram_type) {
         case DiagramType::TOTAL_PRICE_PER_DATA: {
             return total_price_per_data_.dump();
+        }
+        case DiagramType::PRODUCTS_COUNT: {
+            return products_count_.dump();
         }
         case DiagramType::RECORDS_PER_DATA: {
             return records_per_data_.dump();

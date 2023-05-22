@@ -23,6 +23,12 @@ struct RecordTotalPriceAggregator {
     }
 };
 
+struct RecordCountAggregator {
+    uint64_t operator()(const std::vector<Record>& records) {
+        return static_cast<uint64_t>(records.size());
+    }
+};
+
 struct RecordAveragePriceAggregator {
     double operator()(const std::vector<Record>& records) {
         double total_price = 0;

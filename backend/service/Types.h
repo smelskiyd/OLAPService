@@ -8,6 +8,7 @@
 
 enum class DiagramType {
     TOTAL_PRICE_PER_DATA,
+    PRODUCTS_COUNT,
     RECORDS_PER_DATA,
     COUNT,
     UNDEFINED
