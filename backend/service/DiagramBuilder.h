@@ -26,5 +26,6 @@ class DiagramBuilder {
     Cube<Record, uint64_t> deliveries_per_data_and_time_{{"data", "time"}};
     Cube<Record, uint64_t> deliveries_per_distance_and_time_{{"distance", "time"}};
     Cube<Record, uint64_t> products_count_{{"product_name"}};
+    Cube<Record, PriceRange> price_range_per_data_{{"data"}};
     Cube<Record, MeasureList<Record>> records_per_data_{{"data"}};
 };

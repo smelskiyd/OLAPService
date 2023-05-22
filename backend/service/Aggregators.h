@@ -48,3 +48,23 @@ struct RecordDistanceAggregator {
         return total_price;
     }
 };
+
+struct RecordPriceRangeAggregator {
+    PriceRange operator()(const std::vector<Record>& records) {
+        PriceRange result{0., 0.};
+        result.max_price = records.empty() ? 0. : std::stod(records[0].price);
+        result.min_price = records.empty() ? 0. : std::stod(records[0].price);
+
+        for (const auto& record : records) {
+            const double current_price = std::stod(record.price);
+            if (current_price < result.min_price) {
+                result.min_price = current_price;
+            }
+            if (current_price > result.max_price) {
+                result.max_price = current_price;
+            }
+        }
+
+        return result;
+    }
+};

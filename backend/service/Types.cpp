@@ -13,9 +13,16 @@ DiagramType ConvertStrToDiagramType(const std::string& diagram_type_str) {
         return DiagramType::DELIVERIES_PER_DATA_AND_TIME;
     } else if (diagram_type_str == "DELIVERIES_PER_DISTANCE_AND_TIME") {
         return DiagramType::DELIVERIES_PER_DISTANCE_AND_TIME;
+    } else if (diagram_type_str == "PRICE_RANGE_PER_DATA") {
+        return DiagramType::PRICE_RANGE_PER_DATA;
     } else if (diagram_type_str == "RECORDS_PER_DATA") {
         return DiagramType::RECORDS_PER_DATA;
     } else {
         return DiagramType::UNDEFINED;
     }
+}
+
+std::ostream& operator<<(std::ostream& out, const PriceRange& price_range) {
+    out << "[" << price_range.min_price << ", " << price_range.max_price << "]";
+    return out;
 }
