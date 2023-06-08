@@ -20,14 +20,14 @@ struct MeasureList {
 
 template<typename Measure>
 std::ostream& operator<<(std::ostream& out, const MeasureList<Measure>& list) {
-    out << "{" << '\n';
+    out << "[" << '\n';
     for (size_t i = 0; i < list.data.size(); ++i) {
-        out << "\t{" << list.data[i] << "}";
+        out << "\t\\\"" << list.data[i] << "\\\"";
         if (i + 1 != list.data.size()) {
             out << ",";
         }
         out << '\n';
     }
-    out << "}";
+    out << "]";
     return out;
 }
